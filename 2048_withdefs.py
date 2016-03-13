@@ -46,24 +46,59 @@ print '\nScore: %d' % score
 print '\nHigh score: %d' % highscore
 
 
-while winning == 1:
-	
-	# duplicate values for reordering grid
-	# for 'wad', grid rotated and operation performed as if was 's'
-	tempr4 = list(r4)
-	tempr3 = list(r3)
-	tempr2 = list(r2)
-	tempr1 = list(r1)
-	
-	# more duplicate values to check if any changes have occurred
-	sempr4 = list(r4)
-	sempr3 = list(r3)
-	sempr2 = list(r2)
-	sempr1 = list(r1)
-	
-	# user input
-	x = msvcrt.getch()
 
+def shiftNumbers(r1, r2, r3, r4, score):
+	# shifts grid in direction of movement, doubling same adjacent squares
+	# updates score, adds any new tiles create by doubling
+	for c in range(4):
+		# shifts column down line of movement until all -'s have been killed
+		while type(r4[c]) != int and not (type(r3[c]) != int and type(r2[c]) != int and type(r1[c]) != int):
+			r4[c] = r3[c]
+			r3[c] = r2[c]
+			r2[c] = r1[c]
+			r1[c] = '-'
+		
+		while type(r3[c]) != int and not (type(r2[c]) != int and type(r1[c]) != int):
+			r3[c] = r2[c]
+			r2[c] = r1[c]
+			r1[c] = '-'
+		
+		while type(r2[c]) != int and not (type(r1[c]) != int):
+			r2[c] = r1[c]
+			r1[c] = '-'
+	
+		if r3[c] == r4[c] and type(r4[c]) == int:
+			r4[c] *= 2
+			r3[c] = r2[c]
+			r2[c] = r1[c]
+			r1[c] = '-'
+			
+			score += r4[c]
+		
+			if r2[c] == r3[c] and type(r3[c]) == int:
+				r3[c] *= 2
+				r2[c] = r1[c]
+				
+				score += r3[c]
+			
+		elif r2[c] == r3[c] and type(r3[c]) == int:
+			r3[c] *= 2
+			r2[c] = r1[c]
+			r1[c] = '-'
+			
+			score += r3[c]
+	
+		elif r1[c] == r2[c] and type(r2[c]) == int:
+			r2[c] *= 2
+			r1[c] = '-'
+			
+			score += r2[c]
+	
+	return [score, r1, r2, r3, r4]
+
+
+def orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x):
+	#reorients grid so all actions are as if you were pushing the numbers 'down'
 	if x == 'w':
 		r4 = tempr1
 		r3 = tempr2
@@ -111,60 +146,11 @@ while winning == 1:
 		r1[1] = tempr2[0]
 		r1[2] = tempr3[0]
 		r1[3] = tempr4[0]
+		
+	return [r1, r2, r3, r4]
 
-	
-	# shifts grid in direction of movement, doubling same adjacent squares
-	# updates score, adds any new tiles create by doubling
-	
-	for c in range(4):
-		# shifts column down line of movement until all -'s have been killed
-		while type(r4[c]) != int and not (type(r3[c]) != int and type(r2[c]) != int and type(r1[c]) != int):
-			r4[c] = r3[c]
-			r3[c] = r2[c]
-			r2[c] = r1[c]
-			r1[c] = '-'
-		
-		while type(r3[c]) != int and not (type(r2[c]) != int and type(r1[c]) != int):
-			r3[c] = r2[c]
-			r2[c] = r1[c]
-			r1[c] = '-'
-		
-		while type(r2[c]) != int and not (type(r1[c]) != int):
-			r2[c] = r1[c]
-			r1[c] = '-'
-	
-		if r3[c] == r4[c] and type(r4[c]) == int:
-			r4[c] *= 2
-			r3[c] = r2[c]
-			r2[c] = r1[c]
-			r1[c] = '-'
-			
-			score += r4[c]
-		
-			if r2[c] == r3[c] and type(r3[c]) == int:
-				r3[c] *= 2
-				r2[c] = r1[c]
-				
-				score += r3[c]
-			
-		elif r2[c] == r3[c] and type(r3[c]) == int:
-			r3[c] *= 2
-			r2[c] = r1[c]
-			r1[c] = '-'
-			
-			score += r3[c]
-	
-		elif r1[c] == r2[c] and type(r2[c]) == int:
-			r2[c] *= 2
-			r1[c] = '-'
-			
-			score += r2[c]
-	
-	tempr1 = list(r1)
-	tempr2 = list(r2)
-	tempr3 = list(r3)
-	tempr4 = list(r4)
-	
+
+def reorientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x):
 	# rotates grid back to original orientation
 	
 	if x == 'w':
@@ -215,13 +201,98 @@ while winning == 1:
 		r1[2] = tempr3[0]
 		r1[3] = tempr4[0]
 	
+	return [r1, r2, r3, r4]
+	
+def nextMove(r1, r2, r3, r4, score, y = None):
+	# duplicate values for reordering grid
+	# for 'wad', grid rotated and operation performed as if was 's'
 	tempr4 = list(r4)
 	tempr3 = list(r3)
 	tempr2 = list(r2)
 	tempr1 = list(r1)
 	
-	# keeps integers evenly spaced
+	# more duplicate values to check if any changes have occurred
+	sempr4 = list(r4)
+	sempr3 = list(r3)
+	sempr2 = list(r2)
+	sempr1 = list(r1)
 	
+	# user input
+	if y == None:
+		x = msvcrt.getch()
+	else:
+		x = y
+	
+	orientedgrid = orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
+	r1 = orientedgrid[0]
+	r2 = orientedgrid[1]
+	r3 = orientedgrid[2]
+	r4 = orientedgrid[3]
+	
+
+	shiftedgrid = shiftNumbers(r1, r2, r3, r4, score)
+	score = shiftedgrid[0]
+	r1 = shiftedgrid[1]
+	r2 = shiftedgrid[2]
+	r3 = shiftedgrid[3]
+	r4 = shiftedgrid[4]
+
+	
+	tempr1 = list(r1)
+	tempr2 = list(r2)
+	tempr3 = list(r3)
+	tempr4 = list(r4)
+	
+	
+	reorientedgrid = reorientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
+	r1 = reorientedgrid[0]
+	r2 = reorientedgrid[1]
+	r3 = reorientedgrid[2]
+	r4 = reorientedgrid[3]
+	
+	
+	tempr4 = list(r4)
+	tempr3 = list(r3)
+	tempr2 = list(r2)
+	tempr1 = list(r1)
+	
+	return [r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, sempr1, sempr2, sempr3, sempr4, score]
+	
+
+
+def gameOver(score):
+	print 'Game over!'
+	# locally saving highscore
+	if score > highscore:
+		highscorefile.truncate()
+		highscorefile.write(str(score))
+		highscorefile.close()
+		print '\nYou beat the high score!'
+	return 0
+	
+
+
+while winning == 1:
+	
+	newgrid = nextMove(r1, r2, r3, r4, score)
+	r1 = newgrid[0]
+	r2 = newgrid[1]
+	r3 = newgrid[2]
+	r4 = newgrid[3]
+	
+	tempr1 = newgrid[4]
+	tempr2 = newgrid[5]
+	tempr3 = newgrid[6]
+	tempr4 = newgrid[7]
+	
+	sempr1 = newgrid[8]
+	sempr2 = newgrid[9]
+	sempr3 = newgrid[10]
+	sempr4 = newgrid[11]
+	
+	score = newgrid[12]
+	
+	# keeps integers evenly spaced
 	for s in [tempr1, tempr2, tempr3, tempr4]:
 		for i in range(4):
 			if len(str(s[i])) == 1:
@@ -249,6 +320,7 @@ while winning == 1:
 	tempr3 = list(r3)
 	tempr2 = list(r2)
 	tempr1 = list(r1)
+
 	
 	for s in [tempr1, tempr2, tempr3, tempr4]:
 		for i in range(4):
@@ -266,10 +338,20 @@ while winning == 1:
 	print ' '.join(str(r) for r in tempr4)
 	print '\nScore: %d' % score
 	print '\nHigh score: %d' % highscore
-
-# locally saving highscore
-if score > highscore:
-	highscorefile.truncate()
-	highscor.write(str(highscore))
 	
+	wgo = nextMove(r1,r2,r3,r4,score,'w')
+	ago = nextMove(r1,r2,r3,r4,score,'a')
+	sgo = nextMove(r1,r2,r3,r4,score,'s')
+	dgo = nextMove(r1,r2,r3,r4,score,'d')
+	
+	current = [r1, r2, r3, r4]
+	for i in range(4):
+		if current[i] == wgo[i] and wgo[i] == ago[i] and ago[i] == sgo[i] and sgo[i] == dgo[i]:
+			winning += 1
+	if winning > 4:
+		winning = gameOver(score)
+	else:
+		winning = 1
+	
+print 'Do you want to play again?'
 	
