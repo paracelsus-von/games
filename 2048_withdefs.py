@@ -127,80 +127,26 @@ def orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x):
 		r1[3] = tempr4[3]
 	
 	elif x == 'd':
-		r4[0] = tempr1[3]
-		r4[1] = tempr2[3]
-		r4[2] = tempr3[3]
-		r4[3] = tempr4[3]
+		r4[0] = tempr4[3]
+		r4[1] = tempr3[3]
+		r4[2] = tempr2[3]
+		r4[3] = tempr1[3]
 		
-		r3[0] = tempr1[2]
-		r3[1] = tempr2[2]
-		r3[2] = tempr3[2]
-		r3[3] = tempr4[2]
-		
-		r2[0] = tempr1[1]
-		r2[1] = tempr2[1]
-		r2[2] = tempr3[1]
-		r2[3] = tempr4[1]
-		
-		r1[0] = tempr1[0]
-		r1[1] = tempr2[0]
-		r1[2] = tempr3[0]
-		r1[3] = tempr4[0]
-		
-	return [r1, r2, r3, r4]
-
-
-def reorientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x):
-	# rotates grid back to original orientation
-	
-	if x == 'w':
-		r4 = tempr1
-		r3 = tempr2
-		r2 = tempr3
-		r1 = tempr4
-	
-	elif x == 'a':
-		r1[0] = tempr4[0]
-		r1[1] = tempr3[0]
-		r1[2] = tempr2[0]
-		r1[3] = tempr1[0]
+		r3[0] = tempr4[2]
+		r3[1] = tempr3[2]
+		r3[2] = tempr2[2]
+		r3[3] = tempr1[2]
 		
 		r2[0] = tempr4[1]
 		r2[1] = tempr3[1]
 		r2[2] = tempr2[1]
 		r2[3] = tempr1[1]
 		
-		r3[0] = tempr4[2]
-		r3[1] = tempr3[2]
-		r3[2] = tempr2[2]
-		r3[3] = tempr1[2]
-	
-		r4[0] = tempr4[3]
-		r4[1] = tempr3[3]
-		r4[2] = tempr2[3]
-		r4[3] = tempr1[3]
-	
-	elif x == 'd':
-		r4[0] = tempr1[3]
-		r4[1] = tempr2[3]
-		r4[2] = tempr3[3]
-		r4[3] = tempr4[3]
+		r1[0] = tempr4[0]
+		r1[1] = tempr3[0]
+		r1[2] = tempr2[0]
+		r1[3] = tempr1[0]
 		
-		r3[0] = tempr1[2]
-		r3[1] = tempr2[2]
-		r3[2] = tempr3[2]
-		r3[3] = tempr4[2]
-		
-		r2[0] = tempr1[1]
-		r2[1] = tempr2[1]
-		r2[2] = tempr3[1]
-		r2[3] = tempr4[1]
-	
-		r1[0] = tempr1[0]
-		r1[1] = tempr2[0]
-		r1[2] = tempr3[0]
-		r1[3] = tempr4[0]
-	
 	return [r1, r2, r3, r4]
 	
 def nextMove(r1, r2, r3, r4, score, y = None):
@@ -223,11 +169,12 @@ def nextMove(r1, r2, r3, r4, score, y = None):
 	else:
 		x = y
 	
-	orientedgrid = orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
-	r1 = orientedgrid[0]
-	r2 = orientedgrid[1]
-	r3 = orientedgrid[2]
-	r4 = orientedgrid[3]
+	if x in ('w', 'a', 'd'):
+		orientedgrid = orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
+		r1 = orientedgrid[0]
+		r2 = orientedgrid[1]
+		r3 = orientedgrid[2]
+		r4 = orientedgrid[3]
 	
 
 	shiftedgrid = shiftNumbers(r1, r2, r3, r4, score)
@@ -244,11 +191,16 @@ def nextMove(r1, r2, r3, r4, score, y = None):
 	tempr4 = list(r4)
 	
 	
-	reorientedgrid = reorientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
-	r1 = reorientedgrid[0]
-	r2 = reorientedgrid[1]
-	r3 = reorientedgrid[2]
-	r4 = reorientedgrid[3]
+	if x in ('w', 'a', 'd'):
+		if x == 'a':
+			x = 'd'
+		elif x == 'd':
+			x = 'a'
+		reorientedgrid = orientGrid(r1, r2, r3, r4, tempr1, tempr2, tempr3, tempr4, x)
+		r1 = reorientedgrid[0]
+		r2 = reorientedgrid[1]
+		r3 = reorientedgrid[2]
+		r4 = reorientedgrid[3]
 	
 	
 	tempr4 = list(r4)
@@ -339,16 +291,21 @@ while winning == 1:
 	print '\nScore: %d' % score
 	print '\nHigh score: %d' % highscore
 	
-	wgo = nextMove(r1,r2,r3,r4,score,'w')
-	ago = nextMove(r1,r2,r3,r4,score,'a')
-	sgo = nextMove(r1,r2,r3,r4,score,'s')
-	dgo = nextMove(r1,r2,r3,r4,score,'d')
+	zempr4 = list(r4)
+	zempr3 = list(r3)
+	zempr2 = list(r2)
+	zempr1 = list(r1)
+	
+	wgo = nextMove(zempr1,zempr2,zempr3,zempr4,score,'w')
+	ago = nextMove(zempr1,zempr2,zempr3,zempr4,score,'a')
+	sgo = nextMove(zempr1,zempr2,zempr3,zempr4,score,'s')
+	dgo = nextMove(zempr1,zempr2,zempr3,zempr4,score,'d')
 	
 	current = [r1, r2, r3, r4]
 	for i in range(4):
 		if current[i] == wgo[i] and wgo[i] == ago[i] and ago[i] == sgo[i] and sgo[i] == dgo[i]:
 			winning += 1
-	if winning > 4:
+	if winning == 5:
 		winning = gameOver(score)
 	else:
 		winning = 1
