@@ -3,7 +3,7 @@ import msvcrt
 import random
 import os
 
-os.system('cls')
+os.system('cls' if os.name == 'nt' else 'clear')
 
 print("  ___   ___  _  _   ___  ")
 print(" |__ \ / _ \| || | / _ \  ")
@@ -19,27 +19,40 @@ raw_input()
 X = [2, 4]
 X2 = ['-', '-', '-', '-', 2, 2, 4]
 
+# randomly populates grid initially
 r1 = [random.choice(X), random.choice(X), random.choice(X), random.choice(X)]
 r2 = [random.choice(X), random.choice(X), random.choice(X), random.choice(X)]
 r3 = [random.choice(X), random.choice(X), random.choice(X), random.choice(X)]
 r4 = [random.choice(X), random.choice(X), random.choice(X), random.choice(X)]
 
+score = 0
+
 # clears terminal output
-os.system('cls')
+os.system('cls' if os.name == 'nt' else 'clear')
 
 print '\n'
 print '   '.join(str(r) for r in r1)
 print '   '.join(str(r) for r in r2)
 print '   '.join(str(r) for r in r3)
 print '   '.join(str(r) for r in r4)
+print '\nScore: %d' % score
 
 for turn in range(1000):
 	
+	# duplicate values for reordering grid
+	# for wad, grid rotated and operation performed as if was d
 	tempr4 = list(r4)
 	tempr3 = list(r3)
 	tempr2 = list(r2)
 	tempr1 = list(r1)
-
+	
+	# more duplicate values to check if any changes have occurred
+	sempr4 = list(r4)
+	sempr3 = list(r3)
+	sempr2 = list(r2)
+	sempr1 = list(r1)
+	
+	# user input
 	x = msvcrt.getch()
 
 	if x == 'w':
@@ -90,6 +103,10 @@ for turn in range(1000):
 		r1[2] = tempr3[0]
 		r1[3] = tempr4[0]
 
+	
+	# shifts grid in direction of movement, doubling same adjacent squares
+	# updates score, adds any new tiles create by doubling
+	
 	for c in range(4):
 	
 		while type(r4[c]) != int and not (type(r3[c]) != int and type(r2[c]) != int and type(r1[c]) != int):
@@ -112,24 +129,34 @@ for turn in range(1000):
 			r3[c] = r2[c]
 			r2[c] = r1[c]
 			r1[c] = '-'
+			
+			score += r4[c]
 		
 			if r2[c] == r3[c] and type(r3[c]) == int:
 				r3[c] *= 2
 				r2[c] = r1[c]
+				
+				score += r3[c]
 			
 		elif r2[c] == r3[c] and type(r3[c]) == int:
 			r3[c] *= 2
 			r2[c] = r1[c]
 			r1[c] = '-'
+			
+			score += r3[c]
 	
 		elif r1[c] == r2[c] and type(r2[c]) == int:
 			r2[c] *= 2
 			r1[c] = '-'
+			
+			score += r2[c]
 	
 	tempr1 = list(r1)
 	tempr2 = list(r2)
 	tempr3 = list(r3)
 	tempr4 = list(r4)
+	
+	# rotates grid back to original orientation
 	
 	if x == 'w':
 		r4 = tempr1
@@ -184,6 +211,8 @@ for turn in range(1000):
 	tempr2 = list(r2)
 	tempr1 = list(r1)
 	
+	# keeps integers evenly spaced
+	
 	for s in [tempr1, tempr2, tempr3, tempr4]:
 		for i in range(4):
 			if len(str(s[i])) == 1:
@@ -192,18 +221,20 @@ for turn in range(1000):
 				s[i] = str(s[i]) + ' '
 	
 	# clears terminal output
-	os.system('cls')
+	os.system('cls' if os.name == 'nt' else 'clear')
 	
 	print '\n'
 	print ' '.join(str(r) for r in tempr1)
 	print ' '.join(str(r) for r in tempr2)
 	print ' '.join(str(r) for r in tempr3)
 	print ' '.join(str(r) for r in tempr4)
+	print '\nScore: %d' % score
 	
-	#adds random new numbers
-	for i in range(4):
-		if type(r1[i]) != int:
-			r1[i] = random.choice(X2)
+	#adds random new numbers if grid has changed
+	if sempr1 != r1 or sempr2 != r2 or sempr3 != r3 or sempr4 != r4:
+		for i in range(4):
+			if type(r1[i]) != int:
+				r1[i] = random.choice(X2)
 	
 	tempr4 = list(r4)
 	tempr3 = list(r3)
@@ -217,12 +248,13 @@ for turn in range(1000):
 			elif len(str(s[i])) == 2:
 				s[i] = str(s[i]) + ' '
 	
-	os.system('cls')
+	os.system('cls' if os.name == 'nt' else 'clear')
 	
 	print '\n'
 	print ' '.join(str(r) for r in tempr1)
 	print ' '.join(str(r) for r in tempr2)
 	print ' '.join(str(r) for r in tempr3)
 	print ' '.join(str(r) for r in tempr4)
+	print '\nScore: %d' % score
 	
 	
